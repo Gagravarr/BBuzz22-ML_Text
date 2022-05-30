@@ -1,3 +1,14 @@
+# Intermediate files for making learning JSON
+wordle/british-english
+wordle/french
+wordle/spanish
+wordle/*.json
+wordle/*.txt
+wordle/real/
+
+# Temp files
+.*.swp
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
