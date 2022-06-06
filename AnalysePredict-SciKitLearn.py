@@ -69,6 +69,12 @@ print(calc_with_squares("bbuzz","bbuzz"))
 
 # ----------------------------------------------------------------------------
 
+# Removes any duplicate letters, may also scramble order
+remove_duplicate_letters = lambda word: "".join(set(word))
+
+# ----------------------------------------------------------------------------
+
+
 # Read in the 5 letter words
 language = "british-english"
 words = pd.read_csv("wordle/%s"%language, header=0, names=["word"])
@@ -86,17 +92,38 @@ print(words.head(5))
 #  off due to the shorter words only that we're working with
 as_letters = words["word"].str.split('',n=5,expand=True).drop(0, axis=1)
 letter_counts = Counter(as_letters.values.flatten())
+
 print(letter_counts.most_common(10))
 
+max_letter_count = letter_counts.most_common(1)[0][1]
+total_letters_count = sum( [letter_counts[x] for x in letter_counts] )
+print("Maximum letter count was %d, from %d" % (max_letter_count, total_letters_count))
+
 # ----------------------------------------------------------------------------
+
 
 # What is a good starting word?
 # We want ones with as many popular letters as possible
 
-# If we include repeats?
-# TODO
+# What ratio of the most popular letter does the word use?
+def score_by_letter_counts(wordrow, remove_duplicate=False):
+   word = wordrow["word"]
+   if remove_duplicate:
+      word = remove_duplicate_letters(word)
+   return np.product( 
+              [letter_counts[l]*1.0/max_letter_count for l in word] )
 
-# Or if we want as many different popular letters as possible?
+# Calculate the scores, with and without repeats
+words_letterscore = words.copy(deep=True)
+words_letterscore["score_all"] = words_letterscore.apply(
+                           lambda x: score_by_letter_counts(x,False), axis=1)
+words_letterscore["score_nodup"] = words_letterscore.apply(
+                           lambda x: score_by_letter_counts(x,True), axis=1)
+
+# Look at the first few
+print(words_letterscore.head(5))
+
+# What are the best, the two different ways?
 # TODO
 
 # ----------------------------------------------------------------------------
