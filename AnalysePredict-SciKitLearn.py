@@ -106,6 +106,7 @@ print("Maximum letter count was %d, from %d" % (max_letter_count, total_letters_
 # We want ones with as many popular letters as possible
 
 # What ratio of the most popular letter does the word use?
+# Optionally score words with duplicate letters as zero
 def score_by_letter_counts(wordrow, skip_duplicates=False):
    word = wordrow["word"]
    if skip_duplicates and len(remove_duplicate_letters(word)) != 5:
@@ -129,18 +130,32 @@ print(words_letterscore.sort_values("score_nodup",ascending=False).head(5))
 
 # ----------------------------------------------------------------------------
 
-# Build a "scorer" for a given Word
-# Will return 6 scores for a given Word - Overall + Per-Letter
-# - Per-letter, give 1.0 if correct, 0.5 if wrong place, 0.0 if not used
-# - Overall, similar but with 0.8 for wrong place, and 0.2 if not used
-def score(answer, guess):
-   # TODO
-   return [0]
+# TODO Something on TF-IDF
+# TODO Something on TF-DF which is more what we need
 
 # ----------------------------------------------------------------------------
 
-# TODO Something on TF-IDF
-# TODO Something on TF-DF which is more what we need
+# Build a "scorer" for a given Word
+# Will return 6 scores for a given Word - Overall + Per-Letter
+# The "hyper-parameters" of the weighting for "right letter wrong place"
+#  can be tuned to give you control over the scoring
+def score(actual, guess, weight_yellow_single=0.5, weight_yellow_overall=0.8,
+                         weight_white_single=0.0, weight_white_overall=0.2):
+   res = [1]*6
+   for i in range (0,5):
+      if guess[i] == actual[i]:
+         # Everything already set
+         pass
+      elif guess[i] in actual:
+         res[0] = res[0] * weight_yellow_overall
+         res[i+1] = weight_yellow_single
+      else:
+         res[0] = res[0] * weight_white_overall
+         res[i+1] = weight_white_single
+         res += result_white
+   return res
+
+print(score("bbuzz","uzbek"))
 
 # ----------------------------------------------------------------------------
 
