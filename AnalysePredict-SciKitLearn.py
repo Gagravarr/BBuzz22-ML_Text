@@ -106,10 +106,10 @@ print("Maximum letter count was %d, from %d" % (max_letter_count, total_letters_
 # We want ones with as many popular letters as possible
 
 # What ratio of the most popular letter does the word use?
-def score_by_letter_counts(wordrow, remove_duplicate=False):
+def score_by_letter_counts(wordrow, skip_duplicates=False):
    word = wordrow["word"]
-   if remove_duplicate:
-      word = remove_duplicate_letters(word)
+   if skip_duplicates and len(remove_duplicate_letters(word)) != 5:
+      return 0
    return np.product( 
               [letter_counts[l]*1.0/max_letter_count for l in word] )
 
@@ -124,7 +124,8 @@ words_letterscore["score_nodup"] = words_letterscore.apply(
 print(words_letterscore.head(5))
 
 # What are the best, the two different ways?
-# TODO
+print(words_letterscore.sort_values("score_all",ascending=False).head(5))
+print(words_letterscore.sort_values("score_nodup",ascending=False).head(5))
 
 # ----------------------------------------------------------------------------
 
