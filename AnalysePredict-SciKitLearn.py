@@ -38,6 +38,22 @@ from sklearn import metrics
 
 # ----------------------------------------------------------------------------
 
+# Try to import things for Notebook display/rendering
+try:
+    from IPython.display import display, HTML
+    notebook = True
+except ImportError:
+    notebook = False
+
+# Pretty-print our DataFrames
+def render(df):
+    if notebook:
+        display(HTML(df.to_html()))
+    else:
+        print(df)
+
+# ----------------------------------------------------------------------------
+
 result_green  = "\U0001F7E9"
 result_yellow = "\U0001F7E8"
 result_white  = "\u2B1C"
@@ -128,6 +144,10 @@ print(words_letterscore.head(5))
 print(words_letterscore.sort_values("score_all",ascending=False).head(5))
 print(words_letterscore.sort_values("score_nodup",ascending=False).head(5))
 
+# How do a few words compare?
+print(words_letterscore.query("word == 'soyuz'"))
+print(words_letterscore.query("word == 'audio'"))
+
 # ----------------------------------------------------------------------------
 
 # TODO Something on TF-IDF
@@ -163,3 +183,7 @@ print(score("bbuzz","soyuz"))
 # Try with just....
 
 # ----------------------------------------------------------------------------
+
+# TF-IDF + MNB
+
+# Score + MNB
