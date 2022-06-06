@@ -55,10 +55,17 @@ def calculate_squares(actual, guess):
          res += result_white
    return "".join(res)
 
-print(calculate_squares("bbuzz","guess"))
-print(calculate_squares("bbuzz","uzbek"))
-print(calculate_squares("bbuzz","soyuz"))
-print(calculate_squares("bbuzz","bbuzz"))
+# Prints the squares, then next to it the letters
+# Letters wrapped in unicode combining boxes to look nicer
+def calc_with_squares(actual, guess):
+   return calculate_squares(actual, guess) + "  " + \
+          " ".join( [ "%s\u20e3" % x for x in guess ] )
+
+# Let's see it in action!
+print(calc_with_squares("bbuzz","guess"))
+print(calc_with_squares("bbuzz","uzbek"))
+print(calc_with_squares("bbuzz","soyuz"))
+print(calc_with_squares("bbuzz","bbuzz"))
 
 # ----------------------------------------------------------------------------
 
