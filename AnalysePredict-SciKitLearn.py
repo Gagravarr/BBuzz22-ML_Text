@@ -141,7 +141,7 @@ print(words_letterscore.sort_values("score_nodup",ascending=False).head(5))
 #  can be tuned to give you control over the scoring
 def score(actual, guess, weight_yellow_single=0.5, weight_yellow_overall=0.8,
                          weight_white_single=0.0, weight_white_overall=0.2):
-   res = [1]*6
+   res = [1.0]*6
    for i in range (0,5):
       if guess[i] == actual[i]:
          # Everything already set
@@ -152,10 +152,10 @@ def score(actual, guess, weight_yellow_single=0.5, weight_yellow_overall=0.8,
       else:
          res[0] = res[0] * weight_white_overall
          res[i+1] = weight_white_single
-         res += result_white
    return res
 
 print(score("bbuzz","uzbek"))
+print(score("bbuzz","soyuz"))
 
 # ----------------------------------------------------------------------------
 
