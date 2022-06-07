@@ -176,6 +176,17 @@ for i in range(10):
    print(words["word"][idx])
    print(tfidf_matrix[idx])
 
+# ----------------------------------------------------------------------------
+
+# Calculate an average TF-IDF score for each word
+words_letterscore["score_tfidf"] = pd.Series([
+   tfidf_matrix[idx].sum()/5 for idx in range(len(words)) ])
+
+render(words_letterscore.head(5))
+
+# What are the best words based on the TF-IDF?
+render(words_letterscore.sort_values("score_tfidf",ascending=False).head(5))
+
 # TODO Something more on TF-IDF
 # TODO Something on TF-DF which is more what we need??
 
