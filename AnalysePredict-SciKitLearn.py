@@ -26,6 +26,7 @@
 import json
 import pickle
 import csv
+import sys
 from collections import namedtuple, defaultdict, Counter
 
 import pandas as pd
@@ -41,7 +42,7 @@ from sklearn import metrics
 # Try to import things for Notebook display/rendering
 try:
     from IPython.display import display, HTML
-    notebook = True
+    notebook = 'ipykernel' in sys.modules
 except ImportError:
     notebook = False
 
@@ -50,6 +51,7 @@ def render(df):
     if notebook:
         display(HTML(df.to_html()))
     else:
+        print("")
         print(df)
 
 # ----------------------------------------------------------------------------
@@ -78,6 +80,7 @@ def calc_with_squares(actual, guess):
           " ".join( [ "%s\u20e3" % x for x in guess ] )
 
 # Let's see it in action!
+print("")
 print(calc_with_squares("bbuzz","guess"))
 print(calc_with_squares("bbuzz","uzbek"))
 print(calc_with_squares("bbuzz","soyuz"))
@@ -94,12 +97,13 @@ remove_duplicate_letters = lambda word: "".join(set(word))
 # Read in the 5 letter words
 language = "british-english"
 words = pd.read_csv("wordle/%s"%language, header=0, names=["word"])
+print("")
 print("Loaded %d words of %s" % (len(words), language))
 
 # ----------------------------------------------------------------------------
 
 # Have a look at our first few words
-print(words.head(5))
+render(words.head(5))
 
 # ----------------------------------------------------------------------------
 
@@ -109,6 +113,7 @@ print(words.head(5))
 as_letters = words["word"].str.split('',n=5,expand=True).drop(0, axis=1)
 letter_counts = Counter(as_letters.values.flatten())
 
+print("")
 print(letter_counts.most_common(10))
 
 max_letter_count = letter_counts.most_common(1)[0][1]
@@ -138,15 +143,15 @@ words_letterscore["score_nodup"] = words_letterscore.apply(
                            lambda x: score_by_letter_counts(x,True), axis=1)
 
 # Look at the first few
-print(words_letterscore.head(5))
+render(words_letterscore.head(5))
 
 # What are the best, the two different ways?
-print(words_letterscore.sort_values("score_all",ascending=False).head(5))
-print(words_letterscore.sort_values("score_nodup",ascending=False).head(5))
+render(words_letterscore.sort_values("score_all",ascending=False).head(5))
+render(words_letterscore.sort_values("score_nodup",ascending=False).head(5))
 
 # How do a few words compare?
-print(words_letterscore.query("word == 'soyuz'"))
-print(words_letterscore.query("word == 'audio'"))
+render(words_letterscore.query("word == 'soyuz'"))
+render(words_letterscore.query("word == 'audio'"))
 
 # ----------------------------------------------------------------------------
 
@@ -174,6 +179,7 @@ def score(actual, guess, weight_yellow_single=0.5, weight_yellow_overall=0.8,
          res[i+1] = weight_white_single
    return res
 
+print("")
 print(score("bbuzz","uzbek"))
 print(score("bbuzz","soyuz"))
 
