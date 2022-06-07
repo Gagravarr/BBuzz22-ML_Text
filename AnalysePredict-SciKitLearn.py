@@ -27,7 +27,9 @@ import json
 import pickle
 import csv
 import sys
+
 from collections import namedtuple, defaultdict, Counter
+from random import randrange
 
 import pandas as pd
 import numpy as np
@@ -155,8 +157,27 @@ render(words_letterscore.query("word == 'audio'"))
 
 # ----------------------------------------------------------------------------
 
-# TODO Something on TF-IDF
-# TODO Something on TF-DF which is more what we need
+
+# Build a per-character TF-IDF
+tfidf = TfidfVectorizer(sublinear_tf=True, min_df=0, stop_words=None,
+                        analyzer="char", ngram_range=(1,1))
+tfidf_matrix = tfidf.fit_transform(words["word"])
+
+print("")
+print("TF-IDF build, shape is:")
+print(tfidf_matrix.shape)
+print("Features (letters) are:")
+print(tfidf.get_feature_names())
+print("")
+
+# See how a few words map with the TF-IDF
+for i in range(10):
+   idx = randrange(len(words))
+   print(words["word"][idx])
+   print(tfidf_matrix[idx])
+
+# TODO Something more on TF-IDF
+# TODO Something on TF-DF which is more what we need??
 
 # ----------------------------------------------------------------------------
 
