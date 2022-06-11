@@ -28,7 +28,7 @@ import pickle
 import csv
 import sys
 
-from collections import namedtuple, defaultdict, Counter
+from collections import namedtuple, defaultdict, Counter, OrderedDict
 from random import randrange
 
 import pandas as pd
@@ -38,6 +38,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import make_pipeline
 from sklearn.metrics.pairwise import linear_kernel
 from sklearn import metrics
+
+import matplotlib.pyplot as plt
 
 # ----------------------------------------------------------------------------
 
@@ -121,6 +123,19 @@ print(letter_counts.most_common(10))
 max_letter_count = letter_counts.most_common(1)[0][1]
 total_letters_count = sum( [letter_counts[x] for x in letter_counts] )
 print("Maximum letter count was %d, from %d" % (max_letter_count, total_letters_count))
+
+# ----------------------------------------------------------------------------
+
+# Graph the letter distributions
+
+# Order the bars so the highest frequency ones go on the left
+ordered_letters = OrderedDict(letter_counts.most_common())
+# Pick a different colour for each letter, from a rainbow-like range
+letter_colors = plt.cm.get_cmap("rainbow")(np.linspace(0,1,len(letter_counts)))
+# Plot as a Bar Chart
+plt.bar(ordered_letters.keys(), ordered_letters.values(), color=letter_colors)
+plt.title("Letter Frequencies")
+plt.show()
 
 # ----------------------------------------------------------------------------
 
