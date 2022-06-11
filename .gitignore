@@ -9,6 +9,10 @@ wordle/real/
 # Temp files
 .*.swp
 
+# Temp images
+*.png
+*.pdf
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

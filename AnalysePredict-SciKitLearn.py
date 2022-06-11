@@ -98,16 +98,21 @@ remove_duplicate_letters = lambda word: "".join(set(word))
 # ----------------------------------------------------------------------------
 
 
-# Read in the 5 letter words
-language = "british-english"
-words = pd.read_csv("wordle/%s"%language, header=0, names=["word"])
-print("")
-print("Loaded %d words of %s" % (len(words), language))
+# Read in the 5 letter words, in English and French
+def load_words(language):
+   words = pd.read_csv("wordle/%s"%language, header=0, names=["word"])
+   print("")
+   print("Loaded %d words of %s" % (len(words), language))
+   return words
+
+words    = load_words("british-english")
+words_fr = load_words("french")
 
 # ----------------------------------------------------------------------------
 
 # Have a look at our first few words
 render(words.head(5))
+render(words_fr.head(5))
 
 # ----------------------------------------------------------------------------
 
@@ -115,6 +120,8 @@ render(words.head(5))
 # Should be similar to the distribution for the language, but may be slightly
 #  off due to the shorter words only that we're working with
 as_letters = words["word"].str.split('',n=5,expand=True).drop(0, axis=1)
+render(as_letters.head(5))
+
 letter_counts = Counter(as_letters.values.flatten())
 
 print("")
@@ -134,9 +141,11 @@ ordered_letters = OrderedDict(letter_counts.most_common())
 letter_colors = plt.cm.get_cmap("rainbow")(np.linspace(0,1,len(letter_counts)))
 # Plot as a Bar Chart
 plt.bar(ordered_letters.keys(), ordered_letters.values(), color=letter_colors)
-plt.title("Letter Frequencies")
-plt.save("letters.png")
-#plt.show()
+plt.title("Letter Frequencies - 5 Letter Words - English")
+# Save as a PNG plus display
+plt.savefig("letter-freqs.png", dpi=150)
+plt.show()
+print(ordered_letters)
 
 # ----------------------------------------------------------------------------
 
@@ -203,8 +212,9 @@ render(words_letterscore.head(5))
 # What are the best words based on the TF-IDF?
 render(words_letterscore.sort_values("score_tfidf",ascending=False).head(5))
 
-# TODO Something more on TF-IDF
-# TODO Something on TF-DF which is more what we need??
+# TF-IDF isn't great....
+# We want the most common letters to start with, not the least!
+# More like TF-DF not TF-IDF
 
 # ----------------------------------------------------------------------------
 
@@ -234,15 +244,28 @@ print(score("bbuzz","soyuz"))
 # ----------------------------------------------------------------------------
 
 # Do we even need AI / ML?
-# Try with just....
+# No... but stats or regexp approaches are out of scope!
 
 # ----------------------------------------------------------------------------
 
-# TF-IDF + MNB
-
-# Score + MNB
+# Clustering?
+# No... We want to get away from eg break / creak / freak / wreak
+# No... Double letters don't give us as much information
 
 # ----------------------------------------------------------------------------
 
 # Play the game, using the earlier squares code
-# TODO
+picked_idx = randrange(len(words))
+picked = words["word"][picked_idx]
+solved = False
+print("\nLet's play Wordle! Game number %d" % picked_idx)
+
+for i in range(6):
+   guess = input("What is your guess #%d? " % (i+1))
+   print(calc_with_squares(picked, guess))
+   if picked == guess:
+      print("Well done! You solved game %d" % picked_idx)
+      solved = True
+      break
+if not solved:
+   print("Sorry, you failed to guess the word in 6 tries, it was %s" % picked)
