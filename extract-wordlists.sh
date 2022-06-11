@@ -16,3 +16,13 @@ for LANGUAGE in $DICTS; do
     tr '[:upper:]' '[:lower:]' | \
     grep '^[a-z][a-z][a-z][a-z][a-z]$' > wordle/$LANGUAGE
 done
+
+# See what we got
+for LANGUAGE in $DICTS; do 
+   echo $LANGUAGE
+   echo `head -10 wordle/$LANGUAGE | tail -10`
+   echo `sed -n '2000,2010p' wordle/$LANGUAGE`
+   echo `sed -n '3000,3010p' wordle/$LANGUAGE`
+   echo `tail -10 wordle/$LANGUAGE`
+   echo ""
+done
