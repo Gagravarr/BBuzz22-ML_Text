@@ -135,7 +135,8 @@ letter_colors = plt.cm.get_cmap("rainbow")(np.linspace(0,1,len(letter_counts)))
 # Plot as a Bar Chart
 plt.bar(ordered_letters.keys(), ordered_letters.values(), color=letter_colors)
 plt.title("Letter Frequencies")
-plt.show()
+plt.save("letters.png")
+#plt.show()
 
 # ----------------------------------------------------------------------------
 
@@ -240,3 +241,8 @@ print(score("bbuzz","soyuz"))
 # TF-IDF + MNB
 
 # Score + MNB
+
+# ----------------------------------------------------------------------------
+
+# Play the game, using the earlier squares code
+# TODO
