@@ -60,28 +60,46 @@ def print_similar_tokens(query_token, num, embed):
         print(' - Cosine sim=%.3f: %s' % (c, (embed.idx_to_token[i])))
 
 # How "close" are two words, in costine terms of their embeddings?
-def find_similarity_score(word_a, word_b):
+def find_similarity_score(word_a, word_b, embed):
    vec_a, vec_b = embed.get_vecs_by_tokens([word_a, word_b])
    return (nd.dot(vec_a, vec_b) / (
             nd.sum(vec_a*vec_a).sqrt() * nd.sum(vec_b*vec_b).sqrt()
           )).asnumpy()[0] * 100
 
-def print_similarity_score(word_a, word_b):
+def print_similarity_score(word_a, word_b, embed):
    print("Difference between %s and %s is %d" % 
-         (word_a, word_b, find_similarity_score(word_a, word_b)))
+         (word_a, word_b, find_similarity_score(word_a, word_b, embed)))
 
 # ----------------------------------------------------------------------------
 
 # Test the embeddings
 print_similar_tokens("linux", 3, glove)
 print_similar_tokens("raise", 3, glove)
+print("")
 
-# Test the embeddings
-print_similarity_score("raise","risen")
-print_similarity_score("raise","above")
-print_similarity_score("raise","below")
-print_similarity_score("raise","shine")
-print_similarity_score("raise","linux")
+# Test the embedding similarity
+print_similarity_score("raise", "risen", glove)
+print_similarity_score("raise", "above", glove)
+print_similarity_score("raise", "below", glove)
+print_similarity_score("raise", "shine", glove)
+print_similarity_score("raise", "linux", glove)
+print("")
+
+# ----------------------------------------------------------------------------
+
+# Looking up word relationships, to verify the embeddings are working
+def get_analogy(token_a, token_b, token_c, embed):
+    vecs = embed.get_vecs_by_tokens([token_a, token_b, token_c])
+    x = vecs[1] - vecs[0] + vecs[2]
+    topk, cos = find_nearest(embed.idx_to_vec, x, 1)
+    return embed.idx_to_token[topk[0]]  # Remove unknown words
+def print_analogy(token_a, token_b, token_c, embed):
+    anal = get_analogy('berlin','germany','paris', embed)
+    print("The analogy for %s -> %s of %s is %s" %
+                                (token_a, token_b, token_c, anal))
+
+print_analogy('berlin','germany','paris', glove)
+print("")
 
 # ----------------------------------------------------------------------------
 
@@ -99,11 +117,35 @@ words = load_words("british-english")
 picked_idx = randrange(len(words))
 picked = words["word"][picked_idx]
 print("\nLet's play Semantle! Game number %d" % picked_idx)
-print(picked)
 
-for i in range(10):
+for i in range(6):
    guess = input("What is your guess #%d? " % (i+1))
-   if guess == picked:
+   if guess == picked or not guess:
       break
    else:
-      print("Not quite, distance is %d" % find_similarity(picked, guess))
+      print("Not quite, distance is %d" % 
+            find_similarity_score(picked, guess, glove))
+print("The answer was %s" % picked)
+print("")
+
+# ----------------------------------------------------------------------------
+
+# How about if we gave a hint that only makes sense in the vector space?
+picked_idx = randrange(len(words))
+picked = words["word"][picked_idx]
+
+def get_gap_word(actual, guess, embed):
+    vecs = embed.get_vecs_by_tokens([actual, guess])
+    x = vecs[1] - vecs[0]
+    topk, cos = find_nearest(embed.idx_to_vec, x, 1)
+    return embed.idx_to_token[topk[0]]  # Remove unknown words
+
+for i in range(6):
+   guess = input("What is your guess #%d? " % (i+1))
+   if guess == picked or not guess:
+      break
+   else:
+      print("Not quite, distance is %d" % 
+            find_similarity_score(picked, guess, glove))
+      print("Vector hint - %s" % get_gap_word(picked, guess, glove))
+print("The answer was %s" % picked)
