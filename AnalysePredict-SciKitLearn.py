@@ -266,7 +266,8 @@ model.fit( list(learn_text), list(learn_text.index) )
 
 # Ask it for similar words
 def recommend(query, model):
-   # Ask for a prediction
+   # Ask for a prediction, predicts the index of a word
+   # Note there's no way to tell it not to keep recommending the same one...
    predictions = model.predict([query])
    if len(predictions) > 0:
       # Find the word for that
@@ -310,18 +311,25 @@ def recommend_play(model):
       else:
          # Keep greens and yellows
          guess = "".join([x if x in actual else '.' for x in guess])
-   print("You didn't get it right! Word was %s" % actual)
+   print("The model didn't get it right! Word was %s" % actual)
+
+print("")
+recommend_play(model)
 
 print("")
 recommend_play(model)
 
 # ----------------------------------------------------------------------------
 
-# Clustering?
+# Unfortunately, this is pretty bad... 
+
+# Clustering? Classifiers?
 # No... We want to get away from eg break / creak / freak / wreak
 # No... Double letters don't give us as much information
 
 # ----------------------------------------------------------------------------
+
+# How about you?
 
 # Play the game, using the earlier squares code
 picked_idx = randrange(len(words))
