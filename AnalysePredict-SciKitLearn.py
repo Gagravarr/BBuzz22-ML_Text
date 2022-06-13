@@ -37,6 +37,8 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import make_pipeline
 from sklearn.metrics.pairwise import linear_kernel
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.cluster import KMeans
 from sklearn import metrics
 
 import matplotlib.pyplot as plt
@@ -65,7 +67,7 @@ result_yellow = "\U0001F7E8"
 result_white  = "\u2B1C"
 result_black  = "\u25A0"
 
-# Prints squares for guesses like the real thing
+# Generates squares for guesses like the real thing
 def calculate_squares(actual, guess):
    res = []
    for i in range (0,5):
@@ -77,11 +79,16 @@ def calculate_squares(actual, guess):
          res += result_white
    return "".join(res)
 
-# Prints the squares, then next to it the letters
+# Generates the squares, then next to it the letters
 # Letters wrapped in unicode combining boxes to look nicer
 def calc_with_squares(actual, guess):
    return calculate_squares(actual, guess) + "  " + \
           " ".join( [ "%s\u20e3" % x for x in guess ] )
+
+# Return if you have one, then the squares
+def calc_squares_win(actual, guess):
+   squares = calculate_squares(actual, guess)
+   return [actual==guess, squares]
 
 # Let's see it in action!
 print("")
@@ -248,6 +255,68 @@ print(score("bbuzz","soyuz"))
 
 # ----------------------------------------------------------------------------
 
+# Multinomial Naive Bayes
+# Classier which can predict from learning what's similar
+
+# Train one on the TF-IDF scores of the words
+classifier = MultinomialNB()
+model = make_pipeline(tfidf, classifier)
+learn_text = words["word"]
+model.fit( list(learn_text), list(learn_text.index) )
+
+# Ask it for similar words
+def recommend(query, model):
+   # Ask for a prediction
+   predictions = model.predict([query])
+   if len(predictions) > 0:
+      # Find the word for that
+      pred_idx = predictions[0]
+      word = learn_text[pred_idx]
+      return word
+   return None
+def print_recommend(query, model):
+   guess = recommend(query, model)
+   print("Model guessed from %s - %s" % (query, guess))
+
+print("")
+print_recommend("arise", model)
+print_recommend("raise", model)
+print_recommend("..ise", model)
+print_recommend("r..se", model)
+
+# ----------------------------------------------------------------------------
+
+# Ask our MNB to play Wordle!
+# Our TF-IDF has lost the information on letter position, it is
+#  a "bag of letters"
+# That means we can consider greens and yellows together, not great...
+# Any letter not in our A-Z is ignored, so use . for letters we don't know
+
+def recommend_play(model):
+   # Pick a random word to guess
+   picked_idx = randrange(len(words))
+   actual = words["word"][picked_idx]
+   # We don't know any words, model will pick something
+   guess = "....."
+
+   for guessnum in range(6):
+      # Ask the model to recommend a word based on what we have
+      guess = recommend(guess, model)
+      # How was it?
+      won, squares = calc_squares_win(actual, guess)
+      print(squares + "   " + guess)
+      if won:
+         break
+      else:
+         # Keep greens and yellows
+         guess = "".join([x if x in actual else '.' for x in guess])
+   print("You didn't get it right! Word was %s" % actual)
+
+print("")
+recommend_play(model)
+
+# ----------------------------------------------------------------------------
+
 # Clustering?
 # No... We want to get away from eg break / creak / freak / wreak
 # No... Double letters don't give us as much information
@@ -262,8 +331,9 @@ print("\nLet's play Wordle! Game number %d" % picked_idx)
 
 for i in range(6):
    guess = input("What is your guess #%d? " % (i+1))
-   print(calc_with_squares(picked, guess))
-   if picked == guess:
+   won, squares = calc_squares_win(picked, guess)
+   print(squares)
+   if won:
       print("Well done! You solved game %d" % picked_idx)
       solved = True
       break
