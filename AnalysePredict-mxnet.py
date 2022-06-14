@@ -94,11 +94,13 @@ def get_analogy(token_a, token_b, token_c, embed):
     topk, cos = find_nearest(embed.idx_to_vec, x, 1)
     return embed.idx_to_token[topk[0]]  # Remove unknown words
 def print_analogy(token_a, token_b, token_c, embed):
-    anal = get_analogy('berlin','germany','paris', embed)
+    anal = get_analogy(token_a, token_b, token_c, embed)
     print("The analogy for %s -> %s of %s is %s" %
                                 (token_a, token_b, token_c, anal))
 
 print_analogy('berlin','germany','paris', glove)
+print_analogy('madrid','spain','lisbon', glove)
+print_analogy('man','boy','woman', glove)
 print("")
 
 # ----------------------------------------------------------------------------
